@@ -1,5 +1,7 @@
 # O-Stache
 
+[![Build Status](https://travis-ci.org/wryun/ostache.svg?branch=master)](https://travis-ci.org/wryun/ostache)
+
 This is a simple adaptation of mustache templates - designed for plain text - to
 structured data. Of course, you can use mustache templates to generate structured
 data, but you lose the ability of JSON/YAML/etc. tools to easily validate it.
