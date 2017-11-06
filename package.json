@@ -1,0 +1,22 @@
+{
+  "name": "ostache",
+  "version": "0.0.1",
+  "description": "Templating language for structured data",
+  "main": "index.js",
+  "dependencies": {
+    "mustache": "^2.3.0"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "mustache",
+    "template",
+    "json",
+    "yaml",
+    "cloudformation",
+    "kubernetes"
+  ],
+  "author": "James Haggerty",
+  "license": "Apache-2.0"
+}

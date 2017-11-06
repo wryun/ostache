@@ -1,0 +1,31 @@
+[
+  {
+    "desc": "passes through normal objects unchanged",
+    "template": "x",
+    "parameters": {"x": 1},
+    "result": "x"
+  },
+  {
+    "desc": "substitute at top-level",
+    "template": "{{x}}",
+    "parameters": {"x": 1},
+    "result": 1
+  },
+  {
+    "desc": "substitute if true",
+    "template": {
+      "{{#x}}": "hello",
+      "{{^x}}": "blah"
+    },
+    "parameters": {"x": 1},
+    "result": "hello"
+  },
+  {
+    "desc": "iterates over templated array",
+    "template": {
+      "{{#x}}": "{{a}}"
+    },
+    "parameters": {"x": [{"a": 1}, {"a": 2}, {"a": 3}]},
+    "result": [1, 2, 3]
+  }
+]
