@@ -20,11 +20,10 @@ libraries implemented in other languages.
 
 ## See also
 
-- https://selecttransform.github.io/site/
-- https://taskcluster.github.io/json-e/
-- http://jsonnet.org/
-- https://github.com/mandelsoft/spiff
-- https://en.wikipedia.org/wiki/XSLT
+- Googler's hyper-complex version of this: http://jsonnet.org/
+- Mozillians' slightly less complex version of this: https://taskcluster.github.io/json-e/
+- CloudFoundry's version abandoned due to complexity: https://github.com/mandelsoft/spiff
+- Something that is really quite close to this (and if I had known...): https://selecttransform.github.io/site/
 
 You can also use json query languages to build arbitrary structured outputs (i.e. they
 can generate templates where the parameters are the input, and the query is effectively
