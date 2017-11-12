@@ -23,10 +23,10 @@
   {
     "desc": "iterates over templated array",
     "template": {
-      "((#x))": "((a))"
+      "((#x))": ["((a))", "((y))"]
     },
-    "parameters": {"x": [{"a": 1}, {"a": 2}, {"a": 3}]},
-    "result": [1, 2, 3]
+    "parameters": {"y": 0, "x": [{"a": 1}, {"a": 2}, {"a": 3}]},
+    "result": [[1, 0], [2, 0], [3, 0]]
   },
   {
     "desc": "string templating",

@@ -1,10 +1,14 @@
 'use strict'
 
 const assert = require('assert')
-const stringTemplate = require('./stringTemplate')
 const {isEmpty, isTrue, findType} = require('./common')
+const stringTemplate = require('./stringTemplate')
+const {Context} = require('./context')
 
-exports.render = render
+exports.render = function externalRender (json, context) {
+  return render(json, new Context(context))
+}
+
 function render (json, context) {
   switch (findType(json)) {
     case 'string':
@@ -21,7 +25,7 @@ function render (json, context) {
 function renderString (s, context) {
   const match = /^\(\(([^)]*)\)\)$/.exec(s)
   if (match) {
-    return context[match[1]]
+    return context.lookup(match[1])
   } else {
     // so, this forces us to reparse the string each time we evaluate...
     // could cache, or build a proper tree for the whole thing?
@@ -52,41 +56,47 @@ function renderObject (o, context) {
     }
   }
 
-  // templated vars win - should we 'merge' here?
-  Object.assign(objectResult, templateResult)
   if (singleResult !== undefined) {
     assert.ok(
-      isEmpty(objectResult),
+      isEmpty(objectResult) && isEmpty(templateResult),
       `${singleResult} resolves to non-object type when there are object fields at same level`)
     return singleResult
   } else {
+    // templated vars win - should we 'merge' here?
+    Object.assign(objectResult, templateResult)
     return objectResult
   }
 }
 
 function renderCommand (command, variable, contents, context) {
+  if (command === '!') { // it's a comment - ignore
+    return
+  }
+
+  assert('#^'.includes(command), `Unknown command: ${command}`)
+
+  const value = context.lookup(variable)
+  const valueIsTrue = isTrue(value)
+
   switch (command) {
     case '#':
-      if (isTrue(context[variable])) {
-        switch (findType(context[variable])) {
+      if (valueIsTrue) {
+        switch (findType(value)) {
           case 'object':
-            return render(contents, context[variable])
+            return render(contents, new Context(value, context))
           case 'array':
-            return context[variable]
-              .map(newContext => render(contents, newContext))
+            return value.map(elem => render(contents, new Context(elem, context)))
           default:
             return render(contents, context)
         }
       }
       break
     case '^':
-      if (!isTrue(context[variable])) {
+      if (!valueIsTrue) {
         return render(contents, context)
       }
       break
-    case '!': // it's a comment...
-      break
-    default:
-      assert(false, `Unknown command: ${command}`)
+    default: // should never happen
+      assert(false, 'Internal error')
   }
 }

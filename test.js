@@ -2,7 +2,7 @@
 
 const fs = require('fs')
 const assert = require('assert')
-const render = require('./index').render
+const {render} = require('./index')
 
 let pass = 0
 let fail = 0

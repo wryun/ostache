@@ -1,12 +1,13 @@
 'use strict'
 
 const assert = require('assert')
-const tokenise = require('./tokenise').tokenise
+const {tokenise} = require('./tokenise')
+const {Context} = require('./context')
 const {isTrue, findType} = require('./common')
 
 exports.render = render
 function render (s, context) {
-  return parse(tokenise(s), context).eval(context).join('')
+  return parse(tokenise(s), context).eval(context)
 }
 
 class ListNode {
@@ -21,7 +22,7 @@ class ListNode {
   eval (context) {
     return this.contents
       .map(node => node.eval(context))
-      .reduce((x, y) => x.concat(y), [])
+      .join('')
   }
 }
 
@@ -60,21 +61,22 @@ const NodesByType = {
   },
   '': class LookupNode extends LeafNode {
     eval (context) {
-      return context[this.token]
+      return context.lookup(this.token)
     }
   },
   '#': class HashNode extends ContentNode {
     eval (context) {
-      if (!isTrue(context[this.token])) {
+      const value = context.lookup(this.token)
+      if (!isTrue(value)) {
         return ''
       }
 
-      switch (findType(context[this.token])) {
+      switch (findType(value)) {
         case 'object':
-          return this.contents.eval(context[this.token])
+          return this.contents.eval(new Context(value, context))
         case 'array':
-          return context[this.token]
-            .map(subcontext => this.contents.eval(subcontext))
+          return value
+            .map(elem => this.contents.eval(new Context(elem, context)))
             .join('')
         default:
           return this.contents.eval(context)
@@ -83,7 +85,8 @@ const NodesByType = {
   },
   '^': class CaretToken extends ContentNode {
     eval (context) {
-      if (isTrue(context[this.token])) {
+      const value = context.lookup(this.token)
+      if (isTrue(value)) {
         return ''
       } else {
         return this.contents.eval(context)
