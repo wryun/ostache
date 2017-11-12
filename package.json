@@ -1,6 +1,6 @@
 {
   "name": "ostache",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Templating language for structured data",
   "main": "index.js",
   "scripts": {
