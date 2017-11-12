@@ -6,7 +6,7 @@ const {isTrue, findType} = require('./common')
 
 exports.render = render
 function render (s, context) {
-  return parse(tokenise(s), context).eval(context)
+  return parse(tokenise(s), context).eval(context).join('')
 }
 
 class ListNode {
@@ -21,7 +21,7 @@ class ListNode {
   eval (context) {
     return this.contents
       .map(node => node.eval(context))
-      .join('')
+      .reduce((x, y) => x.concat(y), [])
   }
 }
 
