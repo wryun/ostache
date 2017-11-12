@@ -7,15 +7,15 @@
   },
   {
     "desc": "substitute at top-level",
-    "template": "{{x}}",
+    "template": "((x))",
     "parameters": {"x": 1},
     "result": 1
   },
   {
     "desc": "substitute if true",
     "template": {
-      "{{#x}}": "hello",
-      "{{^x}}": "blah"
+      "((#x))": "hello",
+      "((^x))": "blah"
     },
     "parameters": {"x": 1},
     "result": "hello"
@@ -23,9 +23,27 @@
   {
     "desc": "iterates over templated array",
     "template": {
-      "{{#x}}": "{{a}}"
+      "((#x))": "((a))"
     },
     "parameters": {"x": [{"a": 1}, {"a": 2}, {"a": 3}]},
     "result": [1, 2, 3]
+  },
+  {
+    "desc": "string templating",
+    "template": "I am NOT a ((a))",
+    "parameters": {"a": "computer"},
+    "result": "I am NOT a computer"
+  },
+  {
+    "desc": "string templating",
+    "template": "I am NOT a ((#a))string((/a))",
+    "parameters": {"a": "computer"},
+    "result": "I am NOT a string"
+  },
+  {
+    "desc": "string templating",
+    "template": "I am NOT a ((#a))((foo))((/a))",
+    "parameters": {"a": {"foo": "template"}},
+    "result": "I am NOT a template"
   }
 ]

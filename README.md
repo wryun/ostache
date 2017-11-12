@@ -2,9 +2,10 @@
 
 [![Build Status](https://travis-ci.org/wryun/ostache.svg?branch=master)](https://travis-ci.org/wryun/ostache)
 
-This is a simple adaptation of mustache templates - designed for plain text - to
-structured data. Of course, you can use mustache templates to generate structured
-data, but you lose the ability of JSON/YAML/etc. tools to easily validate it.
+This is a simple adaptation of mustache style templates to structured data (as opposed to
+plain text/HTML). Of course, you can use mustache templates to generate structured
+data, but you lose the ability of JSON/YAML/etc. tools to easily validate it, and the ability
+to convert the template between different structured formats (e.g. JSON -> YAML -> HOCON -> ...).
 
 The code is currently in quickly hacked together 'proof of concept' state, has
 known holes, and the tests are inadequate. Don't trust it.
