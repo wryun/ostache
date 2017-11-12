@@ -94,7 +94,14 @@ const NodesByType = {
 
 function parse (tokens, context, endtoken) {
   const output = new ListNode()
-  for (const [type, token] of tokens) {
+  while (true) {
+    const {done, value} = tokens.next()
+    if (done) { // we should be expecting nothing...
+      assert.strictEqual(endtoken, undefined, `missing /${endtoken}`)
+      return output
+    }
+
+    const [type, token] = value
     if (type === '/') {
       assert.strictEqual(
         token, endtoken,
@@ -108,7 +115,4 @@ function parse (tokens, context, endtoken) {
     }
     output.push(node)
   }
-
-  assert.strictEqual(endtoken, undefined, `missing /${endtoken}`)
-  return output
 }

@@ -42,8 +42,14 @@
   },
   {
     "desc": "string templating",
-    "template": "I am NOT a ((#a))((foo))((/a))",
+    "template": "I am NOT a ((#a))((foo))((/a)) now",
     "parameters": {"a": {"foo": "template"}},
-    "result": "I am NOT a template"
+    "result": "I am NOT a template now"
+  },
+  {
+    "desc": "string templating",
+    "template": "I am NOT a ((#a))((#c))((b))((/c))((/a))",
+    "parameters": {"a": {"b": "recursivelookup", "c": true}},
+    "result": "I am NOT a recursivelookup"
   }
 ]
