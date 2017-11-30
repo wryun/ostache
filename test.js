@@ -4,6 +4,8 @@ const fs = require('fs')
 const assert = require('assert')
 const {render} = require('./index')
 
+console.log('Testing template applications...')
+
 let pass = 0
 let fail = 0
 
@@ -20,5 +22,5 @@ for (const test of JSON.parse(fs.readFileSync('test.json'))) {
   }
 }
 
-console.log(`\nPASS: ${pass} FAIL: ${fail}`)
+console.log(`PASS: ${pass} FAIL: ${fail}`)
 process.exitCode = fail

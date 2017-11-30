@@ -1,24 +1,24 @@
 'use strict'
 
 const assert = require('assert')
-const {isEmpty, isTrue, findType} = require('./common')
+const {isEmpty, isTrue, findType, deepMerge} = require('./common')
 const stringTemplate = require('./stringTemplate')
 const {Context} = require('./context')
 
-exports.render = function externalRender (json, context) {
-  return render(json, new Context(context))
+exports.render = function externalRender (template, context) {
+  return render(template, new Context(context))
 }
 
-function render (json, context) {
-  switch (findType(json)) {
+function render (template, context) {
+  switch (findType(template)) {
     case 'string':
-      return renderString(json, context)
+      return renderString(template, context)
     case 'array':
-      return json.map(elem => render(elem, context))
+      return template.map(elem => render(elem, context))
     case 'object':
-      return renderObject(json, context)
+      return renderObject(template, context)
     default:
-      return json
+      return template
   }
 }
 
@@ -36,17 +36,33 @@ function renderString (s, context) {
 function renderObject (o, context) {
   const objectResult = {}
   const templateResult = {}
+  const deepMergeTemplateResult = {}
+  let override
+  let deepMergeOverride
   let singleResult
 
   for (const key of Object.keys(o)) {
-    const match = /^\(\(([^()\w])([^)]*)\)\)$/.exec(key)
+    const match = /^(<?)\(\(([^()\w])([^)]*)\)\)$/.exec(key)
     if (!match) {
       objectResult[renderString(key, context)] = render(o[key], context)
     } else {
-      const [fullstr, command, variable] = match
+      const [fullstr, shouldDeepMerge, command, variable] = match
       const result = renderCommand(command, variable, o[key], context)
       if (findType(result) === 'object') {
-        Object.assign(templateResult, result)
+        if (variable === '') {
+          // If it's empty, we treat it as 'highest precedence'
+          // (essentially providing an override which prevents the user
+          // from setting that particular variable)
+          if (shouldDeepMerge) {
+            deepMergeOverride = result
+          } else {
+            override = result
+          }
+        } else if (shouldDeepMerge) {
+          deepMerge(deepMergeTemplateResult, result)
+        } else {
+          Object.assign(templateResult, result)
+        }
       } else if (result !== undefined) {
         assert.strictEqual(
           singleResult, undefined,
@@ -56,15 +72,22 @@ function renderObject (o, context) {
     }
   }
 
+  if (override !== undefined) {
+    Object.assign(deepMergeTemplateResult, override)
+  }
+
+  if (deepMergeOverride !== undefined) {
+    deepMerge(deepMergeTemplateResult, deepMergeOverride)
+  }
+
   if (singleResult !== undefined) {
     assert.ok(
-      isEmpty(objectResult) && isEmpty(templateResult),
+      isEmpty(objectResult) && isEmpty(templateResult) && isEmpty(deepMergeTemplateResult),
       `${singleResult} resolves to non-object type when there are object fields at same level`)
     return singleResult
   } else {
-    // templated vars win - should we 'merge' here?
     Object.assign(objectResult, templateResult)
-    return objectResult
+    return deepMerge(objectResult, deepMergeTemplateResult)
   }
 }
 
@@ -73,9 +96,10 @@ function renderCommand (command, variable, contents, context) {
     return
   }
 
-  assert('#^'.includes(command), `Unknown command: ${command}`)
+  assert.ok('#^'.includes(command), `Unknown command: ${command}`)
 
-  const value = context.lookup(variable)
+  // Empty variable strings are counted as true.
+  const value = variable === '' || context.lookup(variable)
   const valueIsTrue = isTrue(value)
 
   switch (command) {
@@ -97,6 +121,6 @@ function renderCommand (command, variable, contents, context) {
       }
       break
     default: // should never happen
-      assert(false, 'Internal error')
+      assert.ok(false, 'Internal error')
   }
 }

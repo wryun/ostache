@@ -28,4 +28,22 @@ function isEmpty (o) {
   return true
 }
 
-module.exports = {isEmpty, isTrue, findType}
+// Deep merge into target (returning result, but potentially mutating target)
+// If the source has a 'null' value, this is interpreted as a deletion.
+function deepMerge (target, source) {
+  if (findType(source) !== 'object' || findType(target) !== 'object') {
+    return source
+  }
+
+  for (const [key, value] of Object.entries(source)) {
+    if (value === null) {
+      delete target[key]
+    } else {
+      target[key] = deepMerge(target[key], value)
+    }
+  }
+
+  return target
+}
+
+module.exports = {isEmpty, isTrue, findType, deepMerge}

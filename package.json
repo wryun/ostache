@@ -4,6 +4,7 @@
   "description": "Templating language for structured data",
   "main": "index.js",
   "scripts": {
+    "preversion": "npm test",
     "test": "npm run lint && node test.js",
     "lint": "eslint ."
   },

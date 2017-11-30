@@ -12,6 +12,18 @@
     "result": 1
   },
   {
+    "desc": "can use special vars to represent template looking things",
+    "template": "((LPAREN))(x))",
+    "parameters": {"x": 1},
+    "result": "((x))"
+  },
+  {
+    "desc": "nested lookup",
+    "template": "((x.y))",
+    "parameters": {"x": {"y": 1}},
+    "result": 1
+  },
+  {
     "desc": "substitute if true",
     "template": {
       "((#x))": "hello",
@@ -21,7 +33,152 @@
     "result": "hello"
   },
   {
-    "desc": "iterates over templated array",
+    "desc": "substitute if true",
+    "template": {
+      "((#x))": "hello",
+      "((^x))": "blah"
+    },
+    "parameters": {"x": 1},
+    "result": "hello"
+  },
+  {
+    "desc": "conditional have merge precedence",
+    "template": {
+      "target": 1,
+      "((#x))": {
+        "target": 2
+      }
+    },
+    "parameters": {"x": 1},
+    "result": {"target": 2}
+  },
+  {
+    "desc": "empty conditionals are highest precedence merge",
+    "template": {
+      "target": 1,
+      "((#x))": {
+        "target": 2
+      },
+      "((#))": {
+        "target": 3
+      }
+    },
+    "parameters": {"x": 1},
+    "result": {"target": 3}
+  },
+  {
+    "desc": "using < causes a deep merge",
+    "template": {
+      "target": {
+        "a": 1,
+        "b": 2
+      },
+      "<((#x))": {
+        "target": {
+          "b": 0,
+          "c": 3
+        }
+      }
+    },
+    "parameters": {"x": 1},
+    "result": {"target": {
+      "a": 1,
+      "b": 0,
+      "c": 3
+    }}
+  },
+  {
+    "desc": "deep merges can delete values using null",
+    "template": {
+      "target": {
+        "a": 1,
+        "b": 2
+      },
+      "<((#x))": {
+        "target": {
+          "b": null,
+          "c": 3
+        }
+      }
+    },
+    "parameters": {"x": 1},
+    "result": {"target": {
+      "a": 1,
+      "c": 3
+    }}
+  },
+  {
+    "desc": "deep merge takes precedence over normal merge",
+    "template": {
+      "target": {
+        "a": 1,
+        "b": 2
+      },
+      "<((#x))": {
+        "target": {
+          "b": 1
+        }
+      },
+      "((#x))": {
+        "target": {
+          "b": 0,
+          "c": 3
+        }
+      }
+    },
+    "parameters": {"x": 1},
+    "result": {"target": {
+      "b": 1,
+      "c": 3
+    }}
+  },
+  {
+    "desc": "no variable deep merge takes precedence",
+    "template": {
+      "target": {
+        "a": 1,
+        "b": 1,
+        "c": 1
+      },
+      "<((#))": {
+        "target": {
+          "c": 5
+        }
+      },
+      "((#))": {
+        "target": {
+          "b": 4,
+          "c": 4
+        }
+      },
+      "<((#x))": {
+        "target": {
+          "b": 3
+        }
+      },
+      "((#x))": {
+        "target": {
+          "b": 2,
+          "c": 2
+        }
+      }
+    },
+    "parameters": {"x": 1},
+    "result": {"target": {
+      "b": 4,
+      "c": 5
+    }}
+  },
+  {
+    "desc": "outer scope reference",
+    "template": {
+      "((#x))": "((y))"
+    },
+    "parameters": {"x": 1, "y": 2},
+    "result": 2
+  },
+  {
+    "desc": "iterates over templated array with outer scope reference",
     "template": {
       "((#x))": ["((a))", "((y))"]
     },
@@ -29,25 +186,25 @@
     "result": [[1, 0], [2, 0], [3, 0]]
   },
   {
-    "desc": "string templating",
+    "desc": "basic string substitution",
     "template": "I am NOT a ((a))",
     "parameters": {"a": "computer"},
     "result": "I am NOT a computer"
   },
   {
-    "desc": "string templating",
+    "desc": "string conditionals",
     "template": "I am NOT a ((#a))string((/a))",
     "parameters": {"a": "computer"},
     "result": "I am NOT a string"
   },
   {
-    "desc": "string templating",
+    "desc": "string substitution inside conditional",
     "template": "I am NOT a ((#a))((foo))((/a)) now",
     "parameters": {"a": {"foo": "template"}},
     "result": "I am NOT a template now"
   },
   {
-    "desc": "string templating",
+    "desc": "string outer scope reference",
     "template": "I am NOT a ((#a))((#c))((b))((/c))((/a))",
     "parameters": {"a": {"b": "recursivelookup", "c": true}},
     "result": "I am NOT a recursivelookup"

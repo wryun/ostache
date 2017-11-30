@@ -2,6 +2,10 @@
 
 const {findType} = require('./common')
 
+const SPECIAL = {
+  LPAREN: '('
+}
+
 exports.Context = class Context {
   constructor (context, parent) {
     this.context = context
@@ -9,6 +13,9 @@ exports.Context = class Context {
   }
 
   lookup (q) {
+    if (q in SPECIAL) {
+      return SPECIAL[q]
+    }
     let c = this.context
     for (const v of q.split('.')) {
       if (findType(c) !== 'object') {
