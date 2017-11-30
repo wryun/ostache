@@ -16,7 +16,7 @@ in anger, it lacks documentation, and there are known sharp edges (e.g. see Erro
 
 The module exposes a render function of the form:
 
-   function render (template, parameters)
+    function render (template, parameters)
 
 where template is some arbitrary structured data, and 'parameters'
 is an object containing values that can be addressed via the template.
@@ -35,21 +35,21 @@ retained only if the variable substitution is the only element in the string.
 
 For example:
 
-  template:
-    y: "((x))"
-  parameters:
-    x: {z: 1}
-  result:
-    y: {z: 1}
+    template:
+      y: "((x))"
+    parameters:
+      x: {z: 1}
+    result:
+      y: {z: 1}
 
 Or, inside a string:
 
-  template:
-    y: "hello ((x))"
-  parameters:
-    x: "world"
-  result:
-    y: "hello world"
+    template:
+      y: "hello ((x))"
+    parameters:
+      x: "world"
+    result:
+      y: "hello world"
 
 Unlike mustache, no HTML escaping is performed.
 
@@ -82,14 +82,14 @@ are unparseable, largely because of the possibility of generating incompatible
 types from multiple conditional includes (or if one has other fields
 in the base object). For instance:
 
-  parameters:
-    x: true
-    y: true
-  template:
-    val: "hello"
-    ((#x)):
-      val2: "bye"
-    ((#y)): "never"
+    parameters:
+      x: true
+      y: true
+    template:
+      val: "hello"
+      ((#x)):
+        val2: "bye"
+      ((#y)): "never"
 
 Here, although the ((#x)) inclusion resolves to an object/map (e.g. one
 can add val2 to the top level fields), because the inclusion of ((#y))
@@ -97,10 +97,10 @@ resolves to a string, it is unclear how that should be 'added' to the object.
 The general rule is that if there is any non-object type here, that should be
 the only type. It would be valid to do:
 
-  parameters:
-    y: true
-  template:
-    ((#y)): "never"
+    parameters:
+      y: true
+    template:
+      ((#y)): "never"
 
 which would simple evaluate to the string "never".
 
