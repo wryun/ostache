@@ -33,21 +33,37 @@
     "result": "hello"
   },
   {
-    "desc": "substitute if true",
+    "desc": "substitute if false",
     "template": {
       "((#x))": "hello",
       "((^x))": "blah"
     },
-    "parameters": {"x": 1},
-    "result": "hello"
+    "parameters": {"x": false},
+    "result": "blah"
   },
   {
-    "desc": "conditional have merge precedence",
+    "desc": "substitute current context",
     "template": {
-      "target": 1,
+      "((#x))": "((.))"
+    },
+    "parameters": {"x": {"x": 1}},
+    "result": {"x": 1}
+  },
+  {
+    "desc": "current context doesn't change with non-object conditional",
+    "template": {
+      "((#x))": "((.))"
+    },
+    "parameters": {"x": "z"},
+    "result": {"x": "z"}
+  },
+  {
+    "desc": "conditionals have merge precedence",
+    "template": {
       "((#x))": {
         "target": 2
-      }
+      },
+      "target": 1
     },
     "parameters": {"x": 1},
     "result": {"target": 2}
@@ -55,13 +71,13 @@
   {
     "desc": "empty conditionals are highest precedence merge",
     "template": {
-      "target": 1,
+      "((#))": {
+        "target": 3
+      },
       "((#x))": {
         "target": 2
       },
-      "((#))": {
-        "target": 3
-      }
+      "target": 1
     },
     "parameters": {"x": 1},
     "result": {"target": 3}
@@ -195,6 +211,12 @@
     "desc": "string conditionals",
     "template": "I am NOT a ((#a))string((/a))",
     "parameters": {"a": "computer"},
+    "result": "I am NOT a string"
+  },
+  {
+    "desc": "string NOT conditionals",
+    "template": "I am NOT a ((#a))string((/a))((^a))number((/a))",
+    "parameters": {"a": "number"},
     "result": "I am NOT a string"
   },
   {

@@ -41,13 +41,13 @@ function renderObject (o, context) {
   let deepMergeOverride
   let singleResult
 
-  for (const key of Object.keys(o)) {
+  for (const [key, value] of Object.entries(o)) {
     const match = /^(<?)\(\(([^()\w])([^)]*)\)\)$/.exec(key)
     if (!match) {
-      objectResult[renderString(key, context)] = render(o[key], context)
+      objectResult[renderString(key, context)] = render(value, context)
     } else {
       const [fullstr, shouldDeepMerge, command, variable] = match
-      const result = renderCommand(command, variable, o[key], context)
+      const result = renderCommand(command, variable, value, context)
       if (findType(result) === 'object') {
         if (variable === '') {
           // If it's empty, we treat it as 'highest precedence'

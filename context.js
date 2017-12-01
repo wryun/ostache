@@ -16,6 +16,9 @@ exports.Context = class Context {
     if (q in SPECIAL) {
       return SPECIAL[q]
     }
+    if (q === '.') {
+      return this.context
+    }
     let c = this.context
     for (const v of q.split('.')) {
       if (findType(c) !== 'object') {
